@@ -1,12 +1,8 @@
-// An HTTP response compatible with API gateway
-export interface HttpResponse {
-  statusCode: number
-  headers: { [key: string]: string }
-  body: string
-}
-
 export class HttpResponse {
-  constructor(statusCode: number, body: any) {
+  statusCode: number
+  body: string
+
+  constructor(statusCode: number, body: { [key: string]: any } | string) {
     this.statusCode = statusCode
     this.body = JSON.stringify(body)
   }
