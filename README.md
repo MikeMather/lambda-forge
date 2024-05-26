@@ -1,5 +1,7 @@
 # Lambda Restful
 
+![Test Badge](https://github.com/github/docs/actions/workflows/test.yml/badge.svg?branch=main)
+
 Lambda Restful is an NPM library that provides a simple and intuitive way to work with AWS Lambda functions in a RESTful manner.
 
 ## Features
