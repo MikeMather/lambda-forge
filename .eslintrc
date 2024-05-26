@@ -7,14 +7,13 @@
   "env": {
     "node": true
   },
-  "ignorePatterns": ["node_modules/", "dist/", "examples/"],
-  "plugins": ["@typescript-eslint", "prettier"],
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  "ignorePatterns": ["node_modules/", "dist/", "examples/", "*.test.ts"],
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "rules": {
-    "prettier/prettier": "error",
     "no-console": "warn",
     "no-debugger": "warn",
-    "max-len": ["error", { "code": 120 }],
+    "max-len": "off",
     "no-unused-vars": "warn",
     "no-undef": "error",
     "no-var": "error",

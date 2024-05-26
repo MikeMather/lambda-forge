@@ -6,8 +6,7 @@ export function Param(paramName: string): ParameterDecorator {
     if (propertyKey === undefined) {
       throw new Error('Param decorator can only be used on a method parameter')
     }
-    const existingParams =
-      Reflect.getMetadata('params', target, propertyKey) || []
+    const existingParams = Reflect.getMetadata('params', target, propertyKey) || []
     existingParams.push({ index: parameterIndex, name: paramName })
     Reflect.defineMetadata('params', existingParams, target, propertyKey)
   }

@@ -6,3 +6,5 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest'
   }
 };
+
+export default config;
