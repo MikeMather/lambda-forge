@@ -1,8 +1,8 @@
-import { injectable } from 'tsyringe';
+import { Service } from 'lambda-restful';
 import dogs from './dogs';
 import { CreateDogDTO } from './DTOs';
 
-@injectable()
+@Service
 export class DogsService {
 
   public getDogById(id: number) {

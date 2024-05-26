@@ -1,6 +1,6 @@
-import { APIGatewayProxyResult } from "aws-lambda";
-import GenericError from "./generic.error";
-import { HttpResponse } from "../utils/httpResponse";
+import { APIGatewayProxyResult } from 'aws-lambda'
+import GenericError from './generic.error'
+import { HttpResponse } from '../utils/httpResponse'
 
 /**
  * ValidationError class
@@ -10,14 +10,14 @@ import { HttpResponse } from "../utils/httpResponse";
  * @param {number} statusCode - HTTP status code
  */
 export default class ValidationError extends GenericError {
-  public statusCode: number;
-  public errors: string[];
-  
+  public statusCode: number
+  public errors: string[]
+
   constructor(message: string, errors: string[]) {
-    super(message);
-    this.name = 'ValidationError';
-    this.statusCode = 400;
-    this.errors = errors;
+    super(message)
+    this.name = 'ValidationError'
+    this.statusCode = 400
+    this.errors = errors
   }
 
   public toResponse(): APIGatewayProxyResult {

@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { injectable } from 'tsyringe'
 
-export function Lambda(target: any) {
+export function Service(target: any) {
   return injectable()(target)
 }
