@@ -1,3 +1,5 @@
-- Getting started
-
-  - [Quick start](quickstart.md)
+- [Quick start](quickstart.md)
+- [Decorators](decorators.md)
+- [Services](services.md)
+- [Middleware](middleware.md)
+- [Testing](testing.md)

@@ -9,7 +9,7 @@ export class GetDogHandler implements RestLambdaHandler {
 
   constructor(@Inject(DogsService) private dogService: DogsService) {}
 
-  public async main(@Param('id') id: string): Promise<APIGatewayProxyResult> {
+  public async main(@Param('id') id: string): Promise<HttpResponse> {
     const dog = this.dogService.getDogById(parseInt(id));
     if (!dog) {
       throw new NotFoundError('Dog not found');
