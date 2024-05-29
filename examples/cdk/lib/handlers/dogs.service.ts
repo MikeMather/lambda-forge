@@ -1,4 +1,4 @@
-import { Service } from 'lambda-restful';
+import { Service } from 'lambda-forge';
 import dogs from './dogs';
 import { CreateDogDTO } from './DTOs';
 

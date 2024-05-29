@@ -10,7 +10,7 @@ type ParamMetadata = {
   services: any[]
 }
 
-export class LambdaFactory {
+export class LambdaForge {
   private container: DependencyContainer
 
   constructor({ services }: ParamMetadata) {

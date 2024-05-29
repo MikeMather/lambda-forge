@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { Lambda, RestLambdaHandler, Param, NotFoundError, HttpResponse, Inject, Event } from 'lambda-restful';
+import { Lambda, RestLambdaHandler, Param, NotFoundError, HttpResponse, Inject, Event } from 'lambda-forge';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { appFactory } from './app';
 import { DogsService } from './dogs.service';
 
 @Lambda
-class GetDogHandler implements RestLambdaHandler {
+export class GetDogHandler implements RestLambdaHandler {
 
   constructor(@Inject(DogsService) private dogService: DogsService) {}
 

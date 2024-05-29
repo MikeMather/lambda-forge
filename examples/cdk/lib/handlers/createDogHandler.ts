@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { Lambda, RestLambdaHandler, Body, HttpResponse, Inject } from 'lambda-restful';
+import { Lambda, RestLambdaHandler, Body, HttpResponse, Inject } from 'lambda-forge';
 import { appFactory } from './app';
 import { DogsService } from './dogs.service';
 import { CreateDogDTO } from './DTOs';
 
 @Lambda
-class CreateDogHandler implements RestLambdaHandler {
+class CreateDogHandler {
 
   constructor(@Inject(DogsService) private dogService: DogsService) {}
 

@@ -1,4 +1,3 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
 import { HttpResponse } from '../utils/httpResponse'
 
 export default class GenericError extends Error {
@@ -9,8 +8,7 @@ export default class GenericError extends Error {
     this.statusCode = 500
   }
 
-  public toResponse(): APIGatewayProxyResult {
-    console.log('Test')
+  public toResponse(): HttpResponse {
     return new HttpResponse(this.statusCode, { message: this.message })
   }
 }

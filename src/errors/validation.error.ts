@@ -1,4 +1,3 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
 import GenericError from './generic.error'
 import { HttpResponse } from '../utils/httpResponse'
 
@@ -20,7 +19,7 @@ export default class ValidationError extends GenericError {
     this.errors = errors
   }
 
-  public toResponse(): APIGatewayProxyResult {
+  public toResponse(): HttpResponse {
     return new HttpResponse(this.statusCode, {
       message: this.message,
       errors: this.errors

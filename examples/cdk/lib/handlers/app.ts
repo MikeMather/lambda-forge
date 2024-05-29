@@ -1,9 +1,7 @@
-import { LambdaFactory } from 'lambda-restful';
+import { LambdaForge } from 'lambda-forge';
 import { DogsService } from './dogs.service';
 
 
-export const appFactory = new LambdaFactory({
-  services: [
-    DogsService
-  ]
+export const appFactory = new LambdaForge({
+  services: [DogsService]
 });

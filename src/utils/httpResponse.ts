@@ -2,12 +2,12 @@ export class HttpResponse {
   statusCode: number
   body: string
 
-  constructor(statusCode: number, body: { [key: string]: any } | string) {
+  constructor(statusCode: number, body?: { [key: string]: any } | string) {
     this.statusCode = statusCode
     this.body = JSON.stringify(body)
   }
 
-  static ok(body: any) {
+  static ok(body?: any) {
     return new HttpResponse(200, body)
   }
 
@@ -16,6 +16,6 @@ export class HttpResponse {
   }
 
   static noContent() {
-    return new HttpResponse(204, '')
+    return new HttpResponse(204)
   }
 }
