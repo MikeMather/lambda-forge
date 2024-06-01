@@ -1,0 +1,24 @@
+{
+  "name": "serverless",
+  "version": "1.0.0",
+  "description": "<!-- title: 'AWS Simple HTTP Endpoint example in NodeJS' description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.' layout: Doc framework: v2 platform: AWS language: nodeJS authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "serverless deploy"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.585.0",
+    "@aws-sdk/lib-dynamodb": "^3.585.0",
+    "@typedorm/common": "^1.15.4",
+    "@typedorm/core": "^1.15.4",
+    "class-transformer": "^0.5.1",
+    "lambda-forge": "file:../..",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "serverless": "^4.0.24"
+  }
+}

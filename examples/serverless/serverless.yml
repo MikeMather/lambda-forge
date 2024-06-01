@@ -1,0 +1,30 @@
+
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: example-serverless
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+functions:
+  posts:
+    handler: src/Post/handlers/getPosts.main
+    events:
+      - httpApi:
+          path: /
+          method: get
+	
+resources: # CloudFormation template syntax from here on.
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: example-blog-app
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: SK
+            KeyType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
