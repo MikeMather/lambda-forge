@@ -1,19 +1,18 @@
-import { AUTO_GENERATE_ATTRIBUTE_STRATEGY, Attribute, AutoGenerateAttribute } from "@typedorm/common";
+import "reflect-metadata";
 import { instanceToPlain, plainToInstance } from "class-transformer";
-
+import { IsString } from "class-validator";
 
 export default class BaseModel {
+  @IsString()
   PK: string;
+
+  @IsString()
   SK: string;
 
-  @AutoGenerateAttribute({
-    strategy: AUTO_GENERATE_ATTRIBUTE_STRATEGY.KSUID
-  })
+  @IsString()
   id: string;
 
-  @AutoGenerateAttribute({
-    strategy: AUTO_GENERATE_ATTRIBUTE_STRATEGY.ISO_DATE
-  })
+  @IsString()
   createdAt: string;
 
   toObject() {

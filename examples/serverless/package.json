@@ -13,12 +13,12 @@
     "@aws-sdk/client-dynamodb": "^3.585.0",
     "@aws-sdk/lib-dynamodb": "^3.585.0",
     "@typedorm/common": "^1.15.4",
-    "@typedorm/core": "^1.15.4",
     "class-transformer": "^0.5.1",
     "lambda-forge": "file:../..",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "esbuild": "^0.20.2",
     "serverless": "^4.0.24"
   }
 }
