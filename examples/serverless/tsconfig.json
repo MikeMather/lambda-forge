@@ -22,6 +22,7 @@
       "strictPropertyInitialization": false,
       "emitDecoratorMetadata": true,
       "resolveJsonModule": true,
+      "esModuleInterop": true,
       "typeRoots": [
         "./node_modules/@types"
       ]

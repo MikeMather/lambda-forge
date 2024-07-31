@@ -2,17 +2,44 @@
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: example-serverless
 
+package:
+  individually: true
+
+custom:
+  esbuild:
+    exclude:
+      - "aws-sdk"
+
 provider:
   name: aws
   runtime: nodejs20.x
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+       - dynamodb:Query
+       - dynamodb:Scan
+       - dynamodb:GetItem
+       - dynamodb:PutItem
+       - dynamodb:UpdateItem
+       - dynamodb:DeleteItem
+      Resource: 
+        Fn::GetAtt:
+            - database
+            - Arn
 functions:
-  posts:
+  getPosts:
     handler: src/Post/handlers/getPosts.main
     events:
       - httpApi:
-          path: /
+          path: /posts
           method: get
-	
+  createPost:
+    handler: src/Post/handlers/createPost.main
+    events:
+      - httpApi:
+          path: /posts
+          method: post
+
 resources: # CloudFormation template syntax from here on.
   Resources:
     database:

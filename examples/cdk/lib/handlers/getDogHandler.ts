@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import { Lambda, RestLambdaHandler, Param, NotFoundError, HttpResponse, Inject, Event } from 'lambda-forge';
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { appFactory } from './app';
 import { DogsService } from './dogs.service';
 
