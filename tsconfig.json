@@ -2,6 +2,7 @@
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
     "outDir": "./dist" /* Redirect output structure to the directory. */,
+    "declarationDir": "./dist/types",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     /* Projects */
