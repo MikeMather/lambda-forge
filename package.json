@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MikeMather/lambda-forge.git"
+  },
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
@@ -17,7 +21,7 @@
     "src/*": "prettier --write --ignore-unknown"
   },
   "keywords": [],
-  "author": "",
+  "author": "MikeMather",
   "license": "ISC",
   "types": "./dist/types/index.d.ts",
   "devDependencies": {
