@@ -11,18 +11,21 @@ import { CustomContextType, ForgeMiddleware } from '../interfaces/ForgeMiddlewar
 type ParamMetadata = {
   services: any[]
   middlewares?: ForgeMiddleware[]
+  defaultHeaders: { [key: string]: string }
 }
 
 export class LambdaForge {
   private container: DependencyContainer
   middlewares: ForgeMiddleware[]
+  defaultHeaders: { [key: string]: string }
 
-  constructor({ services, middlewares = [] }: ParamMetadata) {
+  constructor({ services, middlewares = [], defaultHeaders = {} }: ParamMetadata) {
     this.container = container
     services.forEach((service) => {
       this.container.register(service, { useClass: service })
     })
     this.middlewares = middlewares
+    this.defaultHeaders = defaultHeaders
   }
 
   validationErrorFormatter(errors: any): string[] {
@@ -120,10 +123,10 @@ export class LambdaForge {
 
         const result = await method.apply(handlerInstance, args)
         if (returnType === undefined) {
-          return new HttpResponse(200, result).toResponse()
+          return new HttpResponse(200, result, this.defaultHeaders).toResponse()
         }
         this.validateReturn(result, returnType, returnsMany)
-        return new HttpResponse(returnStatusCode, result).toResponse()
+        return new HttpResponse(returnStatusCode, result, this.defaultHeaders).toResponse()
       } catch (error) {
         if (error instanceof GenericError) {
           return error.toResponse()

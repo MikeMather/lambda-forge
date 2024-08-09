@@ -19,12 +19,13 @@ const validation_error_1 = __importDefault(require("../errors/validation.error")
 const generic_error_1 = __importDefault(require("../errors/generic.error"));
 const httpResponse_1 = require("../utils/httpResponse");
 class LambdaForge {
-    constructor({ services, middlewares = [] }) {
+    constructor({ services, middlewares = [], defaultHeaders = {} }) {
         this.container = tsyringe_1.container;
         services.forEach((service) => {
             this.container.register(service, { useClass: service });
         });
         this.middlewares = middlewares;
+        this.defaultHeaders = defaultHeaders;
     }
     validationErrorFormatter(errors) {
         return errors
@@ -112,10 +113,10 @@ class LambdaForge {
                 }
                 const result = yield method.apply(handlerInstance, args);
                 if (returnType === undefined) {
-                    return new httpResponse_1.HttpResponse(200, result).toResponse();
+                    return new httpResponse_1.HttpResponse(200, result, this.defaultHeaders).toResponse();
                 }
                 this.validateReturn(result, returnType, returnsMany);
-                return new httpResponse_1.HttpResponse(returnStatusCode, result).toResponse();
+                return new httpResponse_1.HttpResponse(returnStatusCode, result, this.defaultHeaders).toResponse();
             }
             catch (error) {
                 if (error instanceof generic_error_1.default) {
