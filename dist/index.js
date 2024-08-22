@@ -25,3 +25,4 @@ Object.defineProperty(exports, "GenericError", { enumerable: true, get: function
 Object.defineProperty(exports, "ValidationError", { enumerable: true, get: function () { return errors_1.ValidationError; } });
 var httpResponse_1 = require("./src/utils/httpResponse");
 Object.defineProperty(exports, "HttpResponse", { enumerable: true, get: function () { return httpResponse_1.HttpResponse; } });
+__exportStar(require("./src/http"), exports);

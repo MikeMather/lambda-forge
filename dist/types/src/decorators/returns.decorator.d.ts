@@ -4,4 +4,4 @@
  */
 export declare function Returns(statusCode: number, validatorCls: any, options?: {
     many?: boolean;
-}): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
+}): MethodDecorator;

@@ -1,24 +1,21 @@
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { RestLambdaHandler } from '../interfaces/rest-lambda-handler.interface';
 import { BodyParam } from '../decorators/body.decorator';
-import { ForgeMiddleware } from '../interfaces/ForgeMiddleware.interface';
+import { ForgeMiddleware } from '../interfaces/Middleware.interface';
+import { Request } from '../http/Request';
+import { Response } from '../http/Response';
 type ParamMetadata = {
     services: any[];
-    middlewares?: ForgeMiddleware[];
-    defaultHeaders: {
-        [key: string]: string;
-    };
+    middlewares?: (new (...args: any[]) => ForgeMiddleware)[];
 };
 export declare class LambdaForge {
     private container;
-    middlewares: ForgeMiddleware[];
-    defaultHeaders: {
-        [key: string]: string;
-    };
-    constructor({ services, middlewares, defaultHeaders }: ParamMetadata);
+    middlewares: (new (...args: any[]) => ForgeMiddleware)[];
+    constructor({ services, middlewares }: ParamMetadata);
     validationErrorFormatter(errors: any): string[];
-    handleBodyInjection(bodyParameter: BodyParam, event: any): any;
+    handleBodyInjection(bodyParameter: BodyParam, req: Request): any;
     validateReturn(result: any, returnType: any, returnsMany: boolean): void;
+    executeMiddlewares(req: Request, res: Response, middlewares: (new (...args: any[]) => ForgeMiddleware)[]): Promise<void>;
     createHandler(HandlerClass: new (...args: any[]) => RestLambdaHandler): (event: APIGatewayProxyEvent, context: Context) => Promise<APIGatewayProxyResult | void>;
 }
 export {};

@@ -1,6 +1,6 @@
 {
   "name": "lambda-forge",
-  "version": "1.0.3",
+  "version": "1.0.3-beta.0",
   "description": "",
   "main": "./dist/index.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/MikeMather/lambda-forge.git"
   },
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
     "test:watch": "jest --watch",
     "build": "rm -r ./dist && tsc",
     "lint": "eslint .",

@@ -17,15 +17,15 @@ const tsyringe_1 = require("tsyringe");
 const class_validator_1 = require("class-validator");
 const validation_error_1 = __importDefault(require("../errors/validation.error"));
 const generic_error_1 = __importDefault(require("../errors/generic.error"));
-const httpResponse_1 = require("../utils/httpResponse");
+const Request_1 = require("../http/Request");
+const Response_1 = require("../http/Response");
 class LambdaForge {
-    constructor({ services, middlewares = [], defaultHeaders = {} }) {
+    constructor({ services, middlewares = [] }) {
         this.container = tsyringe_1.container;
         services.forEach((service) => {
             this.container.register(service, { useClass: service });
         });
         this.middlewares = middlewares;
-        this.defaultHeaders = defaultHeaders;
     }
     validationErrorFormatter(errors) {
         return errors
@@ -34,14 +34,13 @@ class LambdaForge {
         })
             .flat();
     }
-    handleBodyInjection(bodyParameter, event) {
-        if (!event.body) {
+    handleBodyInjection(bodyParameter, req) {
+        if (!req.body) {
             throw new Error('Missing body in request');
         }
-        const body = JSON.parse(event.body);
         const bodyType = bodyParameter.bodyType;
         const bodyInstance = new bodyType();
-        Object.assign(bodyInstance, body);
+        Object.assign(bodyInstance, req.body);
         const errors = (0, class_validator_1.validateSync)(bodyInstance);
         if (errors.length > 0) {
             throw new validation_error_1.default('Validation error', this.validationErrorFormatter(errors));
@@ -69,54 +68,81 @@ class LambdaForge {
             }
         }
     }
+    executeMiddlewares(req, res, middlewares) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const Middleware of middlewares) {
+                yield new Promise((resolve, reject) => {
+                    const middlewareInstance = this.container.resolve(Middleware);
+                    middlewareInstance.use(req, res, (error) => {
+                        if (error) {
+                            reject(error);
+                        }
+                        else {
+                            resolve();
+                        }
+                    });
+                });
+            }
+        });
+    }
     createHandler(HandlerClass) {
         const handlerInstance = tsyringe_1.container.resolve(HandlerClass);
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
             try {
+                const request = new Request_1.Request(event);
+                const response = new Response_1.Response();
                 const method = handlerInstance.main;
                 const paramsMeta = Reflect.getMetadata('params', handlerInstance, 'main') || [];
+                const paramsPipesMeta = Reflect.getMetadata('paramPipes', handlerInstance, 'main') || [];
                 const bodyMeta = Reflect.getMetadata('body', handlerInstance, 'main');
                 const queryMeta = Reflect.getMetadata('query', handlerInstance, 'main');
                 const eventMeta = Reflect.getMetadata('event', handlerInstance, 'main');
                 const returnType = Reflect.getMetadata('returns', handlerInstance, 'main');
                 const returnStatusCode = Reflect.getMetadata('statusCode', handlerInstance, 'main');
                 const returnsMany = Reflect.getMetadata('returnsMany', handlerInstance, 'main');
-                const customContextMeta = Reflect.getMetadata('context', handlerInstance, 'main');
+                const requestMeta = Reflect.getMetadata('request', handlerInstance, 'main');
+                const middlewares = Reflect.getMetadata('middlewares', handlerInstance, 'main') || [];
                 const args = [];
-                // Execute middlewares
-                const customContext = {};
-                for (let i = 0; i < this.middlewares.length; i++) {
-                    const middleware = this.middlewares[i];
-                    yield middleware.use(event, customContext, () => __awaiter(this, void 0, void 0, function* () {
-                        if (i === this.middlewares.length - 1) {
-                            return yield method.apply(handlerInstance, args);
-                        }
-                    }));
-                }
                 // Inject body parameter
                 if (bodyMeta) {
-                    args[bodyMeta.index] = this.handleBodyInjection(bodyMeta, event);
+                    args[bodyMeta.index] = this.handleBodyInjection(bodyMeta, request);
                 }
                 // Inject query parameters
                 if (queryMeta) {
-                    args[queryMeta.index] = event.queryStringParameters || {};
+                    args[queryMeta.index] = request.query || {};
                 }
-                // Extract path parameters
+                // Extract path parameters and run through pipe functions if any
                 if (paramsMeta.length > 0) {
                     paramsMeta.forEach((param) => {
-                        args[param.index] = event.pathParameters ? event.pathParameters[param.name] : undefined;
+                        const pipes = paramsPipesMeta.filter((pipe) => pipe.index === param.index);
+                        let value = request.params[param.name];
+                        if (pipes.length > 0) {
+                            pipes.forEach((pipe) => {
+                                value = pipe.transform(value);
+                            });
+                        }
+                        args[param.index] = value;
                     });
                 }
-                // Inject event object
+                // Inject raw event object
                 if (eventMeta) {
                     args[eventMeta.index] = event;
                 }
+                yield this.executeMiddlewares(request, response, [...this.middlewares, ...middlewares]);
+                // Inject request object after middleware
+                if (requestMeta) {
+                    args[requestMeta.index] = request;
+                }
                 const result = yield method.apply(handlerInstance, args);
                 if (returnType === undefined) {
-                    return new httpResponse_1.HttpResponse(200, result, this.defaultHeaders).toResponse();
+                    response.statusCode = 200;
+                    response.body = JSON.stringify(result);
+                    return response.send();
                 }
                 this.validateReturn(result, returnType, returnsMany);
-                return new httpResponse_1.HttpResponse(returnStatusCode, result, this.defaultHeaders).toResponse();
+                response.statusCode = returnStatusCode;
+                response.body = JSON.stringify(result);
+                return response.send();
             }
             catch (error) {
                 if (error instanceof generic_error_1.default) {

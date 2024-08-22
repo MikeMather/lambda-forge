@@ -8,4 +8,4 @@ export type BodyParam = {
  * @param dto The DTO class to validate the body against
  * @returns The decorated class
  */
-export declare function Body(dto: new (...args: any[]) => any): any;
+export declare function Body(dto: new (...args: any[]) => any): (target: any, propertyKey: string, parameterIndex: number) => void;

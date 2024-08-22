@@ -4,8 +4,8 @@ import { isValidStatusCode } from '../utils/httpStatus'
  * Specifies the return type of the function. Uses class validator to ensure the return type is correct.
  * @returns
  */
-export function Returns(statusCode: number, validatorCls: any, options?: { many?: boolean }) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Returns(statusCode: number, validatorCls: any, options?: { many?: boolean }): MethodDecorator {
+  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     if (validatorCls === null || validatorCls === undefined || typeof validatorCls !== 'function') {
       throw new Error('Invalid validator class for @Returns() decorator. Ensure that the class is imported and passed correctly.')
     }

@@ -17,4 +17,8 @@ export class DogsService {
     dogs.push(newDog);
     return newDog;
   }
+
+  public getFirstDog() {
+    return dogs[0];
+  }
 }
