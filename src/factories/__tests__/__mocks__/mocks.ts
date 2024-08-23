@@ -1,6 +1,7 @@
 import { IsString } from 'class-validator'
 import { HttpResponse } from '../../../utils/httpResponse'
 import { Inject, Lambda, Service } from '../../../decorators'
+import { OnExecutionStart } from '../../../interfaces'
 
 export class MockDto {
   @IsString()
@@ -8,7 +9,7 @@ export class MockDto {
 }
 
 @Service
-export class MockService {
+export class MockService implements OnExecutionStart {
   hasRun = false
 
   async create() {
@@ -17,8 +18,7 @@ export class MockService {
 
   async onExecutionStart() {
     this.hasRun = true
-    console.debug('Service has started')
-    return 'before'
+    return Promise.resolve()
   }
 }
 
@@ -27,6 +27,7 @@ export class MockLambda {
   constructor(@Inject(MockService) private service: MockService) {}
 
   async main() {
+    throw new Error('Not implemented')
     return HttpResponse.ok()
   }
 }

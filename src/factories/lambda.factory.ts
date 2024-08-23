@@ -5,9 +5,9 @@ import { validateSync } from 'class-validator'
 import { BodyParam } from '../decorators/body.decorator'
 import ValidationError from '../errors/validation.error'
 import GenericError from '../errors/generic.error'
-import { ForgeMiddleware } from '../interfaces/Middleware.interface'
 import { Request } from '../http/Request'
 import { Response } from '../http/Response'
+import { OnExecutionStart, ForgeMiddleware } from '../interfaces'
 
 type ParamMetadata = {
   services: any[]
@@ -26,8 +26,8 @@ export class LambdaForge {
       this.container.register(service, { useClass: service })
       this.container.afterResolution(
         service,
-        (instance: any) => {
-          if (instance.onExecutionStart) {
+        (_t: any, instance: any) => {
+          if ('onExecutionStart' in instance && typeof instance.onExecutionStart === 'function') {
             instance.onExecutionStart()
           }
         },
