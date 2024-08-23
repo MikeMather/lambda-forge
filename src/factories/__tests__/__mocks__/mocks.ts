@@ -1,16 +1,10 @@
 import { IsString } from 'class-validator'
 import { HttpResponse } from '../../../utils/httpResponse'
-import { Service } from '../../../decorators'
+import { Inject, Lambda, Service } from '../../../decorators'
 
 export class MockDto {
   @IsString()
   name: string
-}
-
-export class MockLambda {
-  async main() {
-    return HttpResponse.ok()
-  }
 }
 
 @Service
@@ -21,8 +15,18 @@ export class MockService {
     return 'created'
   }
 
-  async beforeExecution() {
+  async onExecutionStart() {
     this.hasRun = true
+    console.debug('Service has started')
     return 'before'
+  }
+}
+
+@Lambda
+export class MockLambda {
+  constructor(@Inject(MockService) private service: MockService) {}
+
+  async main() {
+    return HttpResponse.ok()
   }
 }

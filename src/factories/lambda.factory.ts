@@ -24,6 +24,15 @@ export class LambdaForge {
     this.services = services
     services.forEach((service) => {
       this.container.register(service, { useClass: service })
+      this.container.afterResolution(
+        service,
+        (instance: any) => {
+          if (instance.onExecutionStart) {
+            instance.onExecutionStart()
+          }
+        },
+        { frequency: 'Once' }
+      )
     })
     this.middlewares = middlewares
   }
@@ -86,21 +95,20 @@ export class LambdaForge {
   }
 
   // runs the preExecution method of all services
-  async runPreExecutionHooks() {
-    for (const service of this.services) {
-      if (service.prototype.beforeExecution) {
-        const serviceInstance = this.container.resolve(service)
-        await serviceInstance.beforeExecution()
-      }
-    }
-  }
+  // async runPreExecutionHooks() {
+  //   for (const service of this.services) {
+  //     if (service.prototype.beforeExecution) {
+  //       const serviceInstance = this.container.resolve(service)
+  //       await serviceInstance.beforeExecution()
+  //     }
+  //   }
+  // }
 
   createHandler(HandlerClass: new (...args: any[]) => RestLambdaHandler) {
     const handlerInstance = container.resolve(HandlerClass)
 
     return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult | void> => {
       try {
-        this.runPreExecutionHooks()
         const request = new Request(event)
         const response = new Response()
 
