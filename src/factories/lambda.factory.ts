@@ -8,6 +8,7 @@ import GenericError from '../errors/generic.error'
 import { Request } from '../http/Request'
 import { Response } from '../http/Response'
 import { ForgeMiddleware } from '../interfaces'
+import { InternalServerError } from '../errors'
 
 type ForgeOptions = {
   services: any[]
@@ -163,7 +164,7 @@ export class LambdaForge {
           return error.toResponse()
         } else {
           console.log(error)
-          throw new GenericError('Internal server error')
+          throw new InternalServerError('Internal server error')
         }
       }
     }

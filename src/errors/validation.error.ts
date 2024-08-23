@@ -13,9 +13,7 @@ export default class ValidationError extends GenericError {
   public errors: string[]
 
   constructor(message: string, errors: string[]) {
-    super(message)
-    this.name = 'ValidationError'
-    this.statusCode = 400
+    super('ValidationError', 400, message)
     this.errors = errors
   }
 

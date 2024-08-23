@@ -19,6 +19,7 @@ const validation_error_1 = __importDefault(require("../errors/validation.error")
 const generic_error_1 = __importDefault(require("../errors/generic.error"));
 const Request_1 = require("../http/Request");
 const Response_1 = require("../http/Response");
+const errors_1 = require("../errors");
 class LambdaForge {
     constructor({ services, middlewares = [] }) {
         this.container = tsyringe_async_1.container;
@@ -95,12 +96,10 @@ class LambdaForge {
     createHandler(HandlerClass) {
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
             const handlerInstance = yield tsyringe_async_1.container.resolve(HandlerClass);
-            console.log("handler instance resolved");
             try {
                 const request = new Request_1.Request(event);
                 const response = new Response_1.Response();
                 const method = handlerInstance.main;
-                console.log("method resolved");
                 const paramsMeta = Reflect.getMetadata('params', handlerInstance, 'main') || [];
                 const paramsPipesMeta = Reflect.getMetadata('paramPipes', handlerInstance, 'main') || [];
                 const bodyMeta = Reflect.getMetadata('body', handlerInstance, 'main');
@@ -142,9 +141,7 @@ class LambdaForge {
                 if (requestMeta) {
                     args[requestMeta.index] = request;
                 }
-                console.log("about to call method");
                 const result = yield method.apply(handlerInstance, args);
-                console.log("method called");
                 if (returnType === undefined) {
                     response.statusCode = 200;
                     response.body = JSON.stringify(result);
@@ -161,7 +158,7 @@ class LambdaForge {
                 }
                 else {
                     console.log(error);
-                    throw new generic_error_1.default('Internal server error');
+                    throw new errors_1.InternalServerError('Internal server error');
                 }
             }
         });

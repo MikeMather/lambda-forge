@@ -1,5 +1,3 @@
-import GenericError from './generic.error'
-import NotFoundError from './notFound.error'
-import ValidationError from './validation.error'
-
-export { GenericError, NotFoundError, ValidationError }
+export * from './generic.error'
+export * from './validation.error'
+export * from './httpErrors'

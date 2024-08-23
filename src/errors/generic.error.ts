@@ -2,10 +2,10 @@ import { HttpResponse } from '../utils/httpResponse'
 
 export default class GenericError extends Error {
   public statusCode: number
-  constructor(message: string) {
+  constructor(name: string, statusCode: number, message: string) {
     super(message)
-    this.name = 'GenericError'
-    this.statusCode = 500
+    this.name = name
+    this.statusCode = statusCode
   }
 
   public toResponse(): HttpResponse {

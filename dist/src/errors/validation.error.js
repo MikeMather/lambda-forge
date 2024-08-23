@@ -14,9 +14,7 @@ const httpResponse_1 = require("../utils/httpResponse");
  */
 class ValidationError extends generic_error_1.default {
     constructor(message, errors) {
-        super(message);
-        this.name = 'ValidationError';
-        this.statusCode = 400;
+        super('ValidationError', 400, message);
         this.errors = errors;
     }
     toResponse() {
