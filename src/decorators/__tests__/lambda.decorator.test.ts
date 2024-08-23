@@ -1,9 +1,9 @@
 import { Lambda } from '../lambda.decorator'
-import { injectable } from 'tsyringe'
+import { injectable } from '@launchtray/tsyringe-async'
 
 const mockInjectable = jest.fn()
 
-jest.mock('tsyringe', () => {
+jest.mock('@launchtray/tsyringe-async', () => {
   return {
     injectable: jest.fn().mockImplementation(() => mockInjectable)
   }
@@ -16,7 +16,7 @@ describe('Lambda Decorator', () => {
 
   it('should call tsyringe injectable', () => {
     const target = {}
-    Lambda(target)
-    expect(mockInjectable).toBeCalledWith(target)
+    Lambda()(target)
+    expect(mockInjectable).toHaveBeenCalledWith(target)
   })
 })

@@ -1,5 +1,7 @@
 # Lambda forge
 
+**Note - this package is still in beta and is not ready to be used in a production environment**
+
 ![Test Badge](https://github.com/github/docs/actions/workflows/test.yml/badge.svg?branch=main)
 
 Lambda forge is an NPM library that provides a simple and intuitive way to work with AWS Lambda functions in a structured manner that encourages following REST best-practices.

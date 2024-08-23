@@ -1,13 +1,12 @@
-import { Service } from 'lambda-forge';
+import { Inject, Service } from 'lambda-forge';
 import dogs from './dogs';
 import { CreateDogDTO } from './DTOs';
+import { DbService } from './db.service';
 
-@Service
+@Service()
 export class DogsService {
 
-  async beforeExecution() {
-    console.log('Before execution');
-  }
+  constructor(@Inject(DbService) private dbService: DbService) {}
 
   public getDogById(id: number) {
     return dogs.find(dog => dog.id === id);

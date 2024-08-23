@@ -1,6 +1,6 @@
 import 'reflect-metadata'
-import { injectable } from 'tsyringe'
+import { injectable } from '@launchtray/tsyringe-async'
 
-export function Lambda(target: any) {
-  return injectable()(target)
+export function Lambda() {
+  return (target: any) => injectable()(target)
 }

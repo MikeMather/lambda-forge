@@ -1,5 +1,6 @@
 import { ForgeMiddleware, Request, Response, Middleware, Inject } from "lambda-forge";
 import { DogsService } from "./dogs.service";
+import { DbService } from "./db.service";
 
 @Middleware
 export class CorsMiddleware implements ForgeMiddleware {
@@ -14,12 +15,9 @@ export class CorsMiddleware implements ForgeMiddleware {
 @Middleware
 export class ExampleMiddleware implements ForgeMiddleware {
 
-    constructor(@Inject(DogsService) private dogService: DogsService) {}
+    constructor(@Inject(DbService) private dbService: DbService) {}
 
     async use(req: Request, res: Response, next: any) {
-        const first = this.dogService.getFirstDog();
-        req.context.firstDog = first;
-        res.setHeader('X-First-Dog', first.breed);
         next();
     }
 }

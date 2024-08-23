@@ -9,3 +9,4 @@ export { Returns } from './returns.decorator';
 export { Middleware } from './middleware.decorator';
 export { Req } from './request.decorator';
 export { UseMiddlewares } from './useMiddlewares.decorator';
+export { OnExecutionStart } from './onExecutionStart.decorator';

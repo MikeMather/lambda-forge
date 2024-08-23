@@ -1,15 +1,15 @@
-import { container, DependencyContainer } from 'tsyringe'
+import { container, DependencyContainer } from '@launchtray/tsyringe-async'
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda'
-import { RestLambdaHandler } from '../interfaces/rest-lambda-handler.interface'
+import { LambdaHandler } from '../interfaces/LambdaHandler.interface'
 import { validateSync } from 'class-validator'
 import { BodyParam } from '../decorators/body.decorator'
 import ValidationError from '../errors/validation.error'
 import GenericError from '../errors/generic.error'
 import { Request } from '../http/Request'
 import { Response } from '../http/Response'
-import { OnExecutionStart, ForgeMiddleware } from '../interfaces'
+import { ForgeMiddleware } from '../interfaces'
 
-type ParamMetadata = {
+type ForgeOptions = {
   services: any[]
   middlewares?: (new (...args: any[]) => ForgeMiddleware)[]
 }
@@ -19,21 +19,9 @@ export class LambdaForge {
   private services: (new (...args: any[]) => any)[]
   middlewares: (new (...args: any[]) => ForgeMiddleware)[]
 
-  constructor({ services, middlewares = [] }: ParamMetadata) {
+  constructor({ services, middlewares = [] }: ForgeOptions) {
     this.container = container
     this.services = services
-    services.forEach((service) => {
-      this.container.register(service, { useClass: service })
-      this.container.afterResolution(
-        service,
-        (_t: any, instance: any) => {
-          if ('onExecutionStart' in instance && typeof instance.onExecutionStart === 'function') {
-            instance.onExecutionStart()
-          }
-        },
-        { frequency: 'Once' }
-      )
-    })
     this.middlewares = middlewares
   }
 
@@ -81,8 +69,8 @@ export class LambdaForge {
 
   async executeMiddlewares(req: Request, res: Response, middlewares: (new (...args: any[]) => ForgeMiddleware)[]) {
     for (const Middleware of middlewares) {
+      const middlewareInstance = await this.container.resolve(Middleware)
       await new Promise<void>((resolve, reject) => {
-        const middlewareInstance = this.container.resolve(Middleware)
         middlewareInstance.use(req, res, (error: any) => {
           if (error) {
             reject(error)
@@ -104,10 +92,9 @@ export class LambdaForge {
   //   }
   // }
 
-  createHandler(HandlerClass: new (...args: any[]) => RestLambdaHandler) {
-    const handlerInstance = container.resolve(HandlerClass)
-
+  createHandler(HandlerClass: new (...args: any[]) => LambdaHandler) {
     return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult | void> => {
+      const handlerInstance = await container.resolve(HandlerClass)
       try {
         const request = new Request(event)
         const response = new Response()

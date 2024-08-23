@@ -1,15 +1,14 @@
 import { HttpResponse } from '../../../utils/httpResponse';
-import { OnExecutionStart } from '../../../interfaces';
 export declare class MockDto {
     name: string;
 }
-export declare class MockService implements OnExecutionStart {
+export declare class MockService {
     hasRun: boolean;
     create(): Promise<string>;
-    onExecutionStart(): Promise<void>;
+    init(): Promise<void>;
 }
 export declare class MockLambda {
-    private service;
-    constructor(service: MockService);
+    private database?;
+    constructor(database?: MockService | undefined);
     main(): Promise<HttpResponse>;
 }

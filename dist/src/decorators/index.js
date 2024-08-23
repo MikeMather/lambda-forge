@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UseMiddlewares = exports.Req = exports.Middleware = exports.Returns = exports.Event = exports.Service = exports.Param = exports.Lambda = exports.Inject = exports.Query = exports.Body = void 0;
+exports.OnExecutionStart = exports.UseMiddlewares = exports.Req = exports.Middleware = exports.Returns = exports.Event = exports.Service = exports.Param = exports.Lambda = exports.Inject = exports.Query = exports.Body = void 0;
 var body_decorator_1 = require("./body.decorator");
 Object.defineProperty(exports, "Body", { enumerable: true, get: function () { return body_decorator_1.Body; } });
 var query_decorator_1 = require("./query.decorator");
@@ -23,3 +23,5 @@ var request_decorator_1 = require("./request.decorator");
 Object.defineProperty(exports, "Req", { enumerable: true, get: function () { return request_decorator_1.Req; } });
 var useMiddlewares_decorator_1 = require("./useMiddlewares.decorator");
 Object.defineProperty(exports, "UseMiddlewares", { enumerable: true, get: function () { return useMiddlewares_decorator_1.UseMiddlewares; } });
+var onExecutionStart_decorator_1 = require("./onExecutionStart.decorator");
+Object.defineProperty(exports, "OnExecutionStart", { enumerable: true, get: function () { return onExecutionStart_decorator_1.OnExecutionStart; } });

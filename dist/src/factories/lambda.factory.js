@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LambdaForge = void 0;
-const tsyringe_1 = require("tsyringe");
+const tsyringe_async_1 = require("@launchtray/tsyringe-async");
 const class_validator_1 = require("class-validator");
 const validation_error_1 = __importDefault(require("../errors/validation.error"));
 const generic_error_1 = __importDefault(require("../errors/generic.error"));
@@ -21,16 +21,8 @@ const Request_1 = require("../http/Request");
 const Response_1 = require("../http/Response");
 class LambdaForge {
     constructor({ services, middlewares = [] }) {
-        this.container = tsyringe_1.container;
+        this.container = tsyringe_async_1.container;
         this.services = services;
-        services.forEach((service) => {
-            this.container.register(service, { useClass: service });
-            this.container.afterResolution(service, (_t, instance) => {
-                if ('onExecutionStart' in instance && typeof instance.onExecutionStart === 'function') {
-                    instance.onExecutionStart();
-                }
-            }, { frequency: 'Once' });
-        });
         this.middlewares = middlewares;
     }
     validationErrorFormatter(errors) {
@@ -77,8 +69,8 @@ class LambdaForge {
     executeMiddlewares(req, res, middlewares) {
         return __awaiter(this, void 0, void 0, function* () {
             for (const Middleware of middlewares) {
+                const middlewareInstance = yield this.container.resolve(Middleware);
                 yield new Promise((resolve, reject) => {
-                    const middlewareInstance = this.container.resolve(Middleware);
                     middlewareInstance.use(req, res, (error) => {
                         if (error) {
                             reject(error);
@@ -101,12 +93,14 @@ class LambdaForge {
     //   }
     // }
     createHandler(HandlerClass) {
-        const handlerInstance = tsyringe_1.container.resolve(HandlerClass);
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
+            const handlerInstance = yield tsyringe_async_1.container.resolve(HandlerClass);
+            console.log("handler instance resolved");
             try {
                 const request = new Request_1.Request(event);
                 const response = new Response_1.Response();
                 const method = handlerInstance.main;
+                console.log("method resolved");
                 const paramsMeta = Reflect.getMetadata('params', handlerInstance, 'main') || [];
                 const paramsPipesMeta = Reflect.getMetadata('paramPipes', handlerInstance, 'main') || [];
                 const bodyMeta = Reflect.getMetadata('body', handlerInstance, 'main');
@@ -148,7 +142,9 @@ class LambdaForge {
                 if (requestMeta) {
                     args[requestMeta.index] = request;
                 }
+                console.log("about to call method");
                 const result = yield method.apply(handlerInstance, args);
+                console.log("method called");
                 if (returnType === undefined) {
                     response.statusCode = 200;
                     response.body = JSON.stringify(result);

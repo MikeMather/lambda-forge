@@ -1,3 +1,3 @@
-export interface RestLambdaHandler {
+export interface LambdaHandler {
   main(...args: any[]): Promise<any>
 }

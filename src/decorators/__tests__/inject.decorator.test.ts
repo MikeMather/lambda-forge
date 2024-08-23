@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 import { Inject } from '../inject.decorator'
-import { inject } from 'tsyringe'
+import { inject } from '@launchtray/tsyringe-async'
 
-jest.mock('tsyringe')
+jest.mock('@launchtray/tsyringe-async')
 
 describe('Inject Decorator', () => {
   it('should be defined', () => {
@@ -10,8 +10,9 @@ describe('Inject Decorator', () => {
   })
 
   it('should call tsyringe inject', () => {
+    const token = 'MockService'
     const target = {}
-    Inject(target)
-    expect(inject).toBeCalledWith(target)
+    Inject(token)
+    expect(inject).toHaveBeenCalledWith(token)
   })
 })

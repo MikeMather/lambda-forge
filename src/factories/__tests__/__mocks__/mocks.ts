@@ -1,33 +1,33 @@
 import { IsString } from 'class-validator'
 import { HttpResponse } from '../../../utils/httpResponse'
-import { Inject, Lambda, Service } from '../../../decorators'
-import { OnExecutionStart } from '../../../interfaces'
+import { Inject, Lambda, OnExecutionStart, Service } from '../../../decorators'
 
 export class MockDto {
   @IsString()
   name: string
 }
 
-@Service
-export class MockService implements OnExecutionStart {
+@Service()
+export class MockService {
   hasRun = false
 
   async create() {
     return 'created'
   }
 
-  async onExecutionStart() {
+  @OnExecutionStart()
+  async init() {
     this.hasRun = true
+    // throw new Error("test")
     return Promise.resolve()
   }
 }
 
-@Lambda
+@Lambda()
 export class MockLambda {
-  constructor(@Inject(MockService) private service: MockService) {}
+  constructor(@Inject(MockService) private database?: MockService) {}
 
   async main() {
-    throw new Error('Not implemented')
     return HttpResponse.ok()
   }
 }

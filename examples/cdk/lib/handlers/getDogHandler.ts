@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { Lambda, RestLambdaHandler, Param, NotFoundError, Inject, Req, Request, UseMiddlewares } from 'lambda-forge';
+import { Lambda, Param, NotFoundError, Inject, Req, Request, UseMiddlewares, LambdaHandler } from 'lambda-forge';
 import { appFactory } from './app';
 import { DogsService } from './dogs.service';
 import { ExampleMiddleware } from './middleware';
 
-@Lambda
-export class GetDogHandler implements RestLambdaHandler {
+@Lambda()
+export class GetDogHandler implements LambdaHandler {
 
   constructor(@Inject(DogsService) private dogService: DogsService) {}
 

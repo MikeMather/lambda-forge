@@ -1,2 +1,2 @@
 export * from './Middleware.interface'
-export * from './OnExecutionStart.interface'
+export * from './LambdaHandler.interface'

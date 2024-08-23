@@ -41,31 +41,37 @@ let MockService = class MockService {
             return 'created';
         });
     }
-    onExecutionStart() {
+    init() {
         return __awaiter(this, void 0, void 0, function* () {
             this.hasRun = true;
+            // throw new Error("test")
             return Promise.resolve();
         });
     }
 };
 exports.MockService = MockService;
+__decorate([
+    (0, decorators_1.OnExecutionStart)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], MockService.prototype, "init", null);
 exports.MockService = MockService = __decorate([
-    decorators_1.Service
+    (0, decorators_1.Service)()
 ], MockService);
 let MockLambda = class MockLambda {
-    constructor(service) {
-        this.service = service;
+    constructor(database) {
+        this.database = database;
     }
     main() {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('Not implemented');
             return httpResponse_1.HttpResponse.ok();
         });
     }
 };
 exports.MockLambda = MockLambda;
 exports.MockLambda = MockLambda = __decorate([
-    decorators_1.Lambda,
+    (0, decorators_1.Lambda)(),
     __param(0, (0, decorators_1.Inject)(MockService)),
     __metadata("design:paramtypes", [MockService])
 ], MockLambda);

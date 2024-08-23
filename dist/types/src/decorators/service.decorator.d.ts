@@ -1,2 +1,4 @@
 import 'reflect-metadata';
-export declare function Service(target: any): void;
+export declare function Service({ singleton }?: {
+    singleton?: boolean;
+}): (target: any) => void;

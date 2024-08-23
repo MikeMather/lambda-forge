@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { LambdaForge } from '../lambda.factory'
 import { MockDto, MockLambda, MockService } from './__mocks__/mocks'
-import { container } from 'tsyringe'
+import { container } from '@launchtray/tsyringe-async'
 import { Request } from '../../http/Request'
 import { Response } from '../../http/Response'
 import MockMiddleware from './__mocks__/mockMiddleware'
@@ -11,15 +11,6 @@ describe('LambdaForge', () => {
 
   beforeEach(() => {
     lambdaForge = new LambdaForge({ services: [MockService] })
-  })
-
-  describe('Register services', () => {
-    it('should register services', () => {
-      const services = [MockService]
-      jest.spyOn(container, 'register')
-      lambdaForge = new LambdaForge({ services })
-      expect(container.register).toHaveBeenCalledWith(MockService, { useClass: MockService })
-    })
   })
 
   describe('validationErrorFormatter', () => {
@@ -61,6 +52,11 @@ describe('LambdaForge', () => {
     it('should return handler function', () => {
       const handler = lambdaForge.createHandler(MockLambda)
       expect(handler).toBeInstanceOf(Function)
+    })
+
+    it('should run a handler function', async () => {
+      const handler = await new LambdaForge({ services: [MockService] }).createHandler(MockLambda)
+      await handler({} as any, {} as any)
     })
   })
 

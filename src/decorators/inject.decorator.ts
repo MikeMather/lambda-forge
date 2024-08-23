@@ -1,5 +1,5 @@
-import { inject } from 'tsyringe'
+import { inject } from '@launchtray/tsyringe-async'
 
-export function Inject(target: any) {
-  return inject(target)
+export function Inject(token: any): any {
+  return inject(token)
 }
