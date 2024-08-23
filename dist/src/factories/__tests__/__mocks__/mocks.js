@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -18,7 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MockService = exports.MockLambda = exports.MockDto = void 0;
+exports.MockLambda = exports.MockService = exports.MockDto = void 0;
 const class_validator_1 = require("class-validator");
 const httpResponse_1 = require("../../../utils/httpResponse");
 const decorators_1 = require("../../../decorators");
@@ -29,14 +32,6 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], MockDto.prototype, "name", void 0);
-class MockLambda {
-    main() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return httpResponse_1.HttpResponse.ok();
-        });
-    }
-}
-exports.MockLambda = MockLambda;
 let MockService = class MockService {
     constructor() {
         this.hasRun = false;
@@ -46,10 +41,10 @@ let MockService = class MockService {
             return 'created';
         });
     }
-    beforeExecution() {
+    onExecutionStart() {
         return __awaiter(this, void 0, void 0, function* () {
             this.hasRun = true;
-            return 'before';
+            return Promise.resolve();
         });
     }
 };
@@ -57,3 +52,20 @@ exports.MockService = MockService;
 exports.MockService = MockService = __decorate([
     decorators_1.Service
 ], MockService);
+let MockLambda = class MockLambda {
+    constructor(service) {
+        this.service = service;
+    }
+    main() {
+        return __awaiter(this, void 0, void 0, function* () {
+            throw new Error('Not implemented');
+            return httpResponse_1.HttpResponse.ok();
+        });
+    }
+};
+exports.MockLambda = MockLambda;
+exports.MockLambda = MockLambda = __decorate([
+    decorators_1.Lambda,
+    __param(0, (0, decorators_1.Inject)(MockService)),
+    __metadata("design:paramtypes", [MockService])
+], MockLambda);

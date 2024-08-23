@@ -1,6 +1,6 @@
 {
   "name": "lambda-forge",
-  "version": "1.0.3-beta.2",
+  "version": "1.0.3-beta.4",
   "description": "",
   "main": "./dist/index.js",
   "repository": {
