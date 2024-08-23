@@ -15,4 +15,4 @@ class CreateDogHandler {
   }
 }
 
-export const handler = appFactory.createHandler(CreateDogHandler);
+export const handler = appFactory.createHttpHandler(CreateDogHandler);

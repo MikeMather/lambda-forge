@@ -83,17 +83,7 @@ export class LambdaForge {
     }
   }
 
-  // runs the preExecution method of all services
-  // async runPreExecutionHooks() {
-  //   for (const service of this.services) {
-  //     if (service.prototype.beforeExecution) {
-  //       const serviceInstance = this.container.resolve(service)
-  //       await serviceInstance.beforeExecution()
-  //     }
-  //   }
-  // }
-
-  createHandler(HandlerClass: new (...args: any[]) => LambdaHandler) {
+  createHttpHandler(HandlerClass: new (...args: any[]) => LambdaHandler) {
     return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult | void> => {
       const handlerInstance = await container.resolve(HandlerClass)
       try {
@@ -159,6 +149,33 @@ export class LambdaForge {
         response.statusCode = returnStatusCode
         response.body = JSON.stringify(result)
         return response.send()
+      } catch (error) {
+        if (error instanceof GenericError) {
+          return error.toResponse()
+        } else {
+          console.log(error)
+          throw new InternalServerError('Internal server error')
+        }
+      }
+    }
+  }
+
+  createHandler(HandlerClass: new (...args: any[]) => LambdaHandler) {
+    return async (event: any, context: any) => {
+      const handlerInstance = await container.resolve(HandlerClass)
+      try {
+        const method = handlerInstance.main
+        const eventMeta = Reflect.getMetadata('event', handlerInstance, 'main')
+
+        if (eventMeta) {
+          const args: any[] = [event]
+          const result = await method.apply(handlerInstance, args)
+          return result
+        }
+
+        const args: any[] = []
+        const result = await method.apply(handlerInstance, args)
+        return result
       } catch (error) {
         if (error instanceof GenericError) {
           return error.toResponse()

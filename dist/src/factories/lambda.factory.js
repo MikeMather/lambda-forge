@@ -84,16 +84,7 @@ class LambdaForge {
             }
         });
     }
-    // runs the preExecution method of all services
-    // async runPreExecutionHooks() {
-    //   for (const service of this.services) {
-    //     if (service.prototype.beforeExecution) {
-    //       const serviceInstance = this.container.resolve(service)
-    //       await serviceInstance.beforeExecution()
-    //     }
-    //   }
-    // }
-    createHandler(HandlerClass) {
+    createHttpHandler(HandlerClass) {
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
             const handlerInstance = yield tsyringe_async_1.container.resolve(HandlerClass);
             try {
@@ -151,6 +142,32 @@ class LambdaForge {
                 response.statusCode = returnStatusCode;
                 response.body = JSON.stringify(result);
                 return response.send();
+            }
+            catch (error) {
+                if (error instanceof generic_error_1.default) {
+                    return error.toResponse();
+                }
+                else {
+                    console.log(error);
+                    throw new errors_1.InternalServerError('Internal server error');
+                }
+            }
+        });
+    }
+    createHandler(HandlerClass) {
+        return (event, context) => __awaiter(this, void 0, void 0, function* () {
+            const handlerInstance = yield tsyringe_async_1.container.resolve(HandlerClass);
+            try {
+                const method = handlerInstance.main;
+                const eventMeta = Reflect.getMetadata('event', handlerInstance, 'main');
+                if (eventMeta) {
+                    const args = [event];
+                    const result = yield method.apply(handlerInstance, args);
+                    return result;
+                }
+                const args = [];
+                const result = yield method.apply(handlerInstance, args);
+                return result;
             }
             catch (error) {
                 if (error instanceof generic_error_1.default) {

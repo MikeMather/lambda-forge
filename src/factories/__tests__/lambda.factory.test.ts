@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { LambdaForge } from '../lambda.factory'
-import { MockDto, MockLambda, MockService } from './__mocks__/mocks'
+import { MockDto, MockLambda, MockService, MockSimplifiedLambda } from './__mocks__/mocks'
 import { container } from '@launchtray/tsyringe-async'
 import { Request } from '../../http/Request'
 import { Response } from '../../http/Response'
@@ -49,13 +49,18 @@ describe('LambdaForge', () => {
   })
 
   describe('createHandler', () => {
-    it('should return handler function', () => {
-      const handler = lambdaForge.createHandler(MockLambda)
+    it('should return http handler function', () => {
+      const handler = lambdaForge.createHttpHandler(MockLambda)
+      expect(handler).toBeInstanceOf(Function)
+    })
+
+    it('should return simplified handler function', () => {
+      const handler = lambdaForge.createHandler(MockSimplifiedLambda)
       expect(handler).toBeInstanceOf(Function)
     })
 
     it('should run a handler function', async () => {
-      const handler = await new LambdaForge({ services: [MockService] }).createHandler(MockLambda)
+      const handler = await new LambdaForge({ services: [MockService] }).createHttpHandler(MockLambda)
       await handler({} as any, {} as any)
     })
   })

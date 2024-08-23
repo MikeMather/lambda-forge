@@ -21,7 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MockLambda = exports.MockService = exports.MockDto = void 0;
+exports.MockSimplifiedLambda = exports.MockLambda = exports.MockService = exports.MockDto = void 0;
 const class_validator_1 = require("class-validator");
 const httpResponse_1 = require("../../../utils/httpResponse");
 const decorators_1 = require("../../../decorators");
@@ -75,3 +75,19 @@ exports.MockLambda = MockLambda = __decorate([
     __param(0, (0, decorators_1.Inject)(MockService)),
     __metadata("design:paramtypes", [MockService])
 ], MockLambda);
+let MockSimplifiedLambda = class MockSimplifiedLambda {
+    constructor(database) {
+        this.database = database;
+    }
+    main() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return [];
+        });
+    }
+};
+exports.MockSimplifiedLambda = MockSimplifiedLambda;
+exports.MockSimplifiedLambda = MockSimplifiedLambda = __decorate([
+    (0, decorators_1.Lambda)(),
+    __param(0, (0, decorators_1.Inject)(MockService)),
+    __metadata("design:paramtypes", [MockService])
+], MockSimplifiedLambda);

@@ -31,3 +31,12 @@ export class MockLambda {
     return HttpResponse.ok()
   }
 }
+
+@Lambda()
+export class MockSimplifiedLambda {
+  constructor(@Inject(MockService) private database?: MockService) {}
+
+  async main() {
+    return []
+  }
+}

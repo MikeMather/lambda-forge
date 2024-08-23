@@ -19,4 +19,4 @@ export class GetDogHandler implements LambdaHandler {
   }
 }
 
-export const handler = appFactory.createHandler(GetDogHandler);
+export const handler = appFactory.createHttpHandler(GetDogHandler);

@@ -12,3 +12,8 @@ export declare class MockLambda {
     constructor(database?: MockService | undefined);
     main(): Promise<HttpResponse>;
 }
+export declare class MockSimplifiedLambda {
+    private database?;
+    constructor(database?: MockService | undefined);
+    main(): Promise<never[]>;
+}
