@@ -1,4 +1,4 @@
-import { APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyResult } from 'aws-lambda';
 export declare class Response {
     statusCode: number;
     headers: {

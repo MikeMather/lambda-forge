@@ -10,7 +10,7 @@ describe('Event Decorator', () => {
     const propertyKey = 'test'
     const parameterIndex = 0
 
-    Event(target, propertyKey, parameterIndex)
+    Event()(target, propertyKey, parameterIndex)
 
     const metadata = Reflect.getMetadata('event', target, propertyKey)
 

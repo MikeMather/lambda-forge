@@ -10,7 +10,7 @@ describe('LambdaForge', () => {
   let lambdaForge: LambdaForge
 
   beforeEach(() => {
-    lambdaForge = new LambdaForge({ services: [] })
+    lambdaForge = new LambdaForge({ services: [MockService] })
   })
 
   describe('Register services', () => {
@@ -67,11 +67,9 @@ describe('LambdaForge', () => {
   describe('executeMiddleware', () => {
     it('should execute middleware', async () => {
       jest.setTimeout(30000)
-      const middleware = new MockMiddleware()
       const req = new Request({} as any)
       const res = new Response()
-      const next = jest.fn()
-      await lambdaForge.executeMiddlewares(req, res, [middleware])
+      await lambdaForge.executeMiddlewares(req, res, [MockMiddleware])
       expect(req.context.user).not.toBeNull()
     })
   })

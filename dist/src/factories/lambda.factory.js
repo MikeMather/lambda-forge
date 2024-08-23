@@ -22,6 +22,7 @@ const Response_1 = require("../http/Response");
 class LambdaForge {
     constructor({ services, middlewares = [] }) {
         this.container = tsyringe_1.container;
+        this.services = services;
         services.forEach((service) => {
             this.container.register(service, { useClass: service });
         });
@@ -85,10 +86,22 @@ class LambdaForge {
             }
         });
     }
+    // runs the preExecution method of all services
+    runPreExecutionHooks() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const service of this.services) {
+                if (service.prototype.beforeExecution) {
+                    const serviceInstance = this.container.resolve(service);
+                    yield serviceInstance.beforeExecution();
+                }
+            }
+        });
+    }
     createHandler(HandlerClass) {
         const handlerInstance = tsyringe_1.container.resolve(HandlerClass);
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
             try {
+                this.runPreExecutionHooks();
                 const request = new Request_1.Request(event);
                 const response = new Response_1.Response();
                 const method = handlerInstance.main;

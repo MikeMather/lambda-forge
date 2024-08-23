@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEvent } from 'aws-lambda';
 export declare class Request {
     query: {
         [key: string]: string | undefined;

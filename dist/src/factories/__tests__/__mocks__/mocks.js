@@ -38,9 +38,18 @@ class MockLambda {
 }
 exports.MockLambda = MockLambda;
 let MockService = class MockService {
+    constructor() {
+        this.hasRun = false;
+    }
     create() {
         return __awaiter(this, void 0, void 0, function* () {
             return 'created';
+        });
+    }
+    beforeExecution() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.hasRun = true;
+            return 'before';
         });
     }
 };

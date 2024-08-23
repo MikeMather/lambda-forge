@@ -5,6 +5,10 @@ import { CreateDogDTO } from './DTOs';
 @Service
 export class DogsService {
 
+  async beforeExecution() {
+    console.log('Before execution');
+  }
+
   public getDogById(id: number) {
     return dogs.find(dog => dog.id === id);
   }

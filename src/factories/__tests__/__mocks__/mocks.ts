@@ -15,7 +15,14 @@ export class MockLambda {
 
 @Service
 export class MockService {
+  hasRun = false
+
   async create() {
     return 'created'
+  }
+
+  async beforeExecution() {
+    this.hasRun = true
+    return 'before'
   }
 }

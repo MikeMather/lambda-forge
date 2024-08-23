@@ -16,10 +16,12 @@ type ParamMetadata = {
 
 export class LambdaForge {
   private container: DependencyContainer
+  private services: (new (...args: any[]) => any)[]
   middlewares: (new (...args: any[]) => ForgeMiddleware)[]
 
   constructor({ services, middlewares = [] }: ParamMetadata) {
     this.container = container
+    this.services = services
     services.forEach((service) => {
       this.container.register(service, { useClass: service })
     })
@@ -83,11 +85,22 @@ export class LambdaForge {
     }
   }
 
+  // runs the preExecution method of all services
+  async runPreExecutionHooks() {
+    for (const service of this.services) {
+      if (service.prototype.beforeExecution) {
+        const serviceInstance = this.container.resolve(service)
+        await serviceInstance.beforeExecution()
+      }
+    }
+  }
+
   createHandler(HandlerClass: new (...args: any[]) => RestLambdaHandler) {
     const handlerInstance = container.resolve(HandlerClass)
 
     return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult | void> => {
       try {
+        this.runPreExecutionHooks()
         const request = new Request(event)
         const response = new Response()
 
