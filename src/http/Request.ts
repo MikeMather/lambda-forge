@@ -11,7 +11,15 @@ export class Request {
     this.query = event.queryStringParameters || {}
     this.params = event.pathParameters || {}
     this.headers = event.headers || {}
-    this.body = event.body ? JSON.parse(event.body) : null
+    this.body = this.parseBody(event.body || '')
     this.context = {}
+  }
+
+  private parseBody(body: string) {
+    try {
+      return JSON.parse(body)
+    } catch (error) {
+      return body
+    }
   }
 }

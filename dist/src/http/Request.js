@@ -6,8 +6,16 @@ class Request {
         this.query = event.queryStringParameters || {};
         this.params = event.pathParameters || {};
         this.headers = event.headers || {};
-        this.body = event.body ? JSON.parse(event.body) : null;
+        this.body = this.parseBody(event.body || '');
         this.context = {};
+    }
+    parseBody(body) {
+        try {
+            return JSON.parse(body);
+        }
+        catch (error) {
+            return body;
+        }
     }
 }
 exports.Request = Request;

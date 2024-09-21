@@ -14,4 +14,5 @@ export declare class Request {
         [key: string]: any;
     };
     constructor(event: APIGatewayProxyEvent);
+    private parseBody;
 }
