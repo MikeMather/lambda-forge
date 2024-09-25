@@ -38,6 +38,9 @@ class LambdaForge {
             throw new Error('Missing body in request');
         }
         const bodyType = bodyParameter.bodyType;
+        if (!bodyType) {
+            return req.body;
+        }
         const bodyInstance = new bodyType();
         Object.assign(bodyInstance, req.body);
         const errors = (0, class_validator_1.validateSync)(bodyInstance);
@@ -83,6 +86,15 @@ class LambdaForge {
                 });
             }
         });
+    }
+    formatResponseBody(resBody) {
+        if (typeof resBody === 'string') {
+            return resBody;
+        }
+        if (resBody instanceof Buffer) {
+            return resBody.toString('base64');
+        }
+        return JSON.stringify(resBody);
     }
     createHttpHandler(HandlerClass) {
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
@@ -135,12 +147,12 @@ class LambdaForge {
                 const result = yield method.apply(handlerInstance, args);
                 if (returnType === undefined) {
                     response.statusCode = 200;
-                    response.body = JSON.stringify(result);
+                    response.body = this.formatResponseBody(result);
                     return response.send();
                 }
                 this.validateReturn(result, returnType, returnsMany);
                 response.statusCode = returnStatusCode;
-                response.body = JSON.stringify(result);
+                response.body = this.formatResponseBody(result);
                 return response.send();
             }
             catch (error) {

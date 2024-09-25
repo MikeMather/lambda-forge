@@ -10,7 +10,7 @@ export type BodyParam = {
  * @param dto The DTO class to validate the body against
  * @returns The decorated class
  */
-export function Body(dto: new (...args: any[]) => any) {
+export function Body(dto?: new (...args: any[]) => any) {
   return function (target: any, propertyKey: string, parameterIndex: number) {
     Reflect.defineMetadata('body', { index: parameterIndex, bodyType: dto }, target, propertyKey)
   }

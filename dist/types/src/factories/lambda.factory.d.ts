@@ -17,6 +17,7 @@ export declare class LambdaForge {
     handleBodyInjection(bodyParameter: BodyParam, req: Request): any;
     validateReturn(result: any, returnType: any, returnsMany: boolean): void;
     executeMiddlewares(req: Request, res: Response, middlewares: (new (...args: any[]) => ForgeMiddleware)[]): Promise<void>;
+    formatResponseBody(resBody: any): string;
     createHttpHandler(HandlerClass: new (...args: any[]) => LambdaHandler): (event: APIGatewayProxyEvent, context: Context) => Promise<APIGatewayProxyResult | void>;
     createHandler(HandlerClass: new (...args: any[]) => LambdaHandler): (event: any, context: any) => Promise<any>;
 }
