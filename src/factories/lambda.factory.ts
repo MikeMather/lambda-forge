@@ -113,6 +113,7 @@ export class LambdaForge {
         const returnStatusCode = Reflect.getMetadata('statusCode', handlerInstance, 'main')
         const returnsMany = Reflect.getMetadata('returnsMany', handlerInstance, 'main')
         const requestMeta = Reflect.getMetadata('request', handlerInstance, 'main')
+        const responseMeta = Reflect.getMetadata('response', handlerInstance, 'main')
         const middlewares = Reflect.getMetadata('middlewares', handlerInstance, 'main') || []
         const args: any[] = []
 
@@ -150,6 +151,11 @@ export class LambdaForge {
         // Inject request object after middleware
         if (requestMeta) {
           args[requestMeta.index] = request
+        }
+
+        // Inject response object after middleware
+        if (responseMeta) {
+          args[responseMeta.index] = response
         }
 
         const result = await method.apply(handlerInstance, args)
