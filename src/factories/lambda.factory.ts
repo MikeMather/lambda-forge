@@ -93,7 +93,7 @@ export class LambdaForge {
     if (resBody instanceof Buffer) {
       return resBody.toString('base64')
     }
-    return JSON.stringify(resBody)
+    return resBody
   }
 
   createHttpHandler(HandlerClass: new (...args: any[]) => LambdaHandler) {
