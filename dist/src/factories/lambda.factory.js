@@ -94,7 +94,7 @@ class LambdaForge {
         if (resBody instanceof Buffer) {
             return resBody.toString('base64');
         }
-        return JSON.stringify(resBody);
+        return resBody;
     }
     createHttpHandler(HandlerClass) {
         return (event, context) => __awaiter(this, void 0, void 0, function* () {
