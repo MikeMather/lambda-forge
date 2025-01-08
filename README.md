@@ -1,223 +1,360 @@
-# Lambda forge
+# Lambda Forge
 
-**Note - this package is still in beta and is not ready to be used in a production environment**
+[![Test Badge](https://github.com/github/docs/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/mikemather/lambda-forge)
 
-![Test Badge](https://github.com/github/docs/actions/workflows/test.yml/badge.svg?branch=main)
+A TypeScript framework for building structured, maintainable AWS Lambda functions with decorators, dependency injection, and strong typing.
 
-Lambda forge is an NPM library that provides a simple and intuitive way to work with AWS Lambda functions in a structured manner that encourages following REST best-practices.
+## Features
 
-## Why lambda-forge?
+- **Declarative Programming**: Use decorators to define handlers, inject dependencies, and manage request/response flows
+- **Dependency Injection**: Built-in DI container for managing services and dependencies
+- **Request Validation**: Automatic request body and parameter validation using class-validator
+- **Middleware Support**: Create and chain middleware for cross-cutting concerns
+- **Type Safety**: Full TypeScript support with strong typing throughout
+- **Framework Agnostic**: Works with AWS CDK, Serverless Framework, or any other deployment tool
+- **HTTP Utilities**: Built-in request/response handling for API Gateway events
+- **Error Handling**: Structured error handling with built-in HTTP error classes
 
-Building REST APIs on AWS Lambda can often involve repetitive code and challenges in maintaining a clean and consistent structure across multiple Lambdas. lambda-forge addresses these issues by offering a framework that emphasizes simplicity, modularity, and testability.
-
-It streamlines the development process, allowing you to focus on business logic while it handles common concerns like dependency injection, validation, and response formatting.
-
-## Advantages
-
-**Decorator-First Approach**
-
-We decorators to enhance the readability and maintainability of your code. Decorators like @Returns, and @Body allow you to define the structure and behavior of your Lambdas in a declarative manner.
-
-<br/>
-
-**Dependency Injection**
-
-Easily inject services directly into your Lambda handlers. This promotes modularity and makes your codebase more organized and easier to test.
-
-<br/>
-
-**Standardized Codebase**
-
-By encouraging an opinionated approach to how your lambdas are written, your code will follow a consistent structure, making it easier for teams to collaborate and maintain large-scale projects.
-
-<br/>
-
-**Type Safety and Validation**
-
-lambda-forge provides tools to do both request body and response schema validations which helps reduce runtime errors and improves development speed and experience.
-
-<br/>
-
-**Seamless Integration with AWS Lambda**
-
-lambda-forge is designed specifically for AWS Lambda, ensuring that your code is optimized for serverless execution. It abstracts away the boilerplate while allowing full control over your Lambda’s behavior.
-
-<br/>
-
-**Deployment Agnostic**
-
-Lambda-forge is deployment-method agnostic. Use your favourite IaC tools such as AWS CDK or Serverless Framework, as long as your typescript compilation method supports decorators.
-
-<br/>
-
-## Getting Started
-
-### Installation
-
-To install lambda-forge, run:
+## Installation
 
 ```bash
-npm install lambda-forge reflect-metadata
+npm install lambda-forge reflect-metadata class-validator class-transformer
 ```
 
-For schema validation support, install class-validator and class-transformer
+Make sure to enable decorator metadata in your `tsconfig.json`:
 
-```bash
-npm install class-validator class-transformer
-```
-
-<br/>
-
-# Example Usage
-
-Here are some examples of using lambda-forge to create a blogging application API. Have a look at the examples directory for more examples and how to integrate it into common IaC frameworks.
-
-Create your lambda generator:
-
-```typescript
-import 'reflect-metadata' // Make sure you include this
-import { Forge } from 'lambda-forge'
-import PostsService from '../services/PostsService'
-
-export const forge = new Forge({ services: [PostsService] })
-```
-
-Create a service to inject into your lambdas:
-
-```typescript
-import 'reflect-metadata'
-import { Service, Inject, HttpResponse } from 'lambda-forge'
-import Post from '../entities/Post'
-import CreatePostDTO from '../dtos/CreatePostDTO'
-import { PostsFilter } from '../dtos/PostsFilter'
-
-@Service
-export default class PostsService {
-  constructor(@Inject(AnotherService) private myOtherService: AnotherService) {}
-
-  async getPosts(filter: PostsFilter): Promise<Post[]> {
-    // get posts
-  }
-
-  async getPost(postId: string): Promise<Post[]> {
-    // get post by ID
-  }
-
-  async createPost(createPost: CreatePostDTO): Promise<Post> {
-    // Handle post creation
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }
 ```
 
-Create A DTO for schema validation
+## Quick Start
+
+### 1. Create a Lambda Factory
 
 ```typescript
-import { IsString, MaxLength } from 'class-validator'
+import { LambdaForge } from 'lambda-forge'
+import { MyService } from './services/my.service'
 
-export default class CreatePostDTO {
+export const forge = new LambdaForge({
+  services: [MyService]
+})
+```
+
+### 2. Define a Service
+
+```typescript
+import { Service } from 'lambda-forge'
+
+@Service()
+export class MyService {
+  async getData(id: string) {
+    // Implementation
+    return { id, data: 'some data' }
+  }
+}
+```
+
+### 3. Create a Handler
+
+```typescript
+import { Lambda, Inject, Param } from 'lambda-forge'
+import { MyService } from './my.service'
+
+@Lambda()
+class GetDataHandler {
+  constructor(@Inject(MyService) private myService: MyService) {}
+
+  async main(@Param('id') id: string) {
+    return await this.myService.getData(id)
+  }
+}
+
+export const handler = forge.createHttpHandler(GetDataHandler)
+```
+
+## Core Concepts
+
+### Decorators
+
+#### Handler Decorators
+- `@Lambda()`: Marks a class as a Lambda handler
+- `@Returns(statusCode, type, options)`: Specifies response type and status code
+
+#### Parameter Decorators
+
+##### @Body(dto)
+Extracts and validates the request body against a DTO class.
+
+```typescript
+import { IsString, IsEmail } from 'class-validator'
+
+class CreateUserDTO {
   @IsString()
-  @MaxLength(300)
-  title: string
+  name: string;
 
+  @IsEmail()
+  email: string;
+}
+
+@Lambda()
+class CreateUserHandler {
+  async main(@Body(CreateUserDTO) user: CreateUserDTO) {
+    // user is validated and typed
+    return { id: '123', ...user };
+  }
+}
+```
+
+##### @Param(name)
+Extracts path parameters from the request URL. Can include optional transform functions.
+
+```typescript
+@Lambda()
+class GetUserHandler {
+  async main(@Param('id', [parseInt]) id: number) {
+    // id is automatically converted to number
+    return { id, name: 'John Doe' };
+  }
+}
+```
+
+##### @Query()
+Extracts query parameters from the request URL.
+
+```typescript
+interface UserFilter {
+  role?: string;
+  status?: 'active' | 'inactive';
+}
+
+@Lambda()
+class ListUsersHandler {
+  async main(@Query() filter: UserFilter) {
+    // filter contains typed query parameters
+    // e.g., /users?role=admin&status=active
+    return this.userService.findUsers(filter);
+  }
+}
+```
+
+##### @Event()
+Injects the raw Lambda event object.
+
+```typescript
+@Lambda()
+class RawEventHandler {
+  async main(@Event() event: APIGatewayProxyEvent) {
+    // Access the raw event object
+    console.log('Request Headers:', event.headers);
+    return { received: true };
+  }
+}
+```
+
+##### @Req()
+Injects the Request object for accessing request properties.
+
+```typescript
+@Lambda()
+class RequestHandler {
+  async main(@Req() req: Request) {
+    // Access request properties
+    const authHeader = req.headers['authorization'];
+    const customContext = req.context;
+    return { authorized: true };
+  }
+}
+```
+
+##### @Res()
+Injects the Response object for modifying the response directly.
+
+```typescript
+@Lambda()
+class ResponseHandler {
+  async main(@Res() res: Response) {
+    // Modify response properties
+    res.setHeader('Cache-Control', 'max-age=3600');
+    res.status(201);
+    return { created: true };
+  }
+}
+```
+
+#### Service Decorators
+- `@Service()`: Marks a class as an injectable service
+- `@Inject(token)`: Injects a dependency
+
+### Request Validation
+
+Use class-validator decorators to validate request bodies:
+
+```typescript
+import { IsString, IsNumber } from 'class-validator'
+
+export class CreateUserDTO {
   @IsString()
-  @MaxLength(2000)
-  content: string
+  name: string
+
+  @IsNumber()
+  age: number
+}
+
+@Lambda()
+class CreateUserHandler {
+  async main(@Body(CreateUserDTO) user: CreateUserDTO) {
+    // user is validated and typed
+  }
 }
 ```
 
-Create your request handler
+### Middleware
+
+Create middleware to handle cross-cutting concerns:
 
 ```typescript
-import 'reflect-metadata'
-import { Lambda, Inject, Returns, Body, Forge } from 'lambda-forge'
-import PostsService from '../services/PostsService'
-import Post from '../entities/Post'
-import CreatePostDTO from '../dtos/CreatePostDTO'
-import { forge } from '../app.ts'
+import { Middleware, ForgeMiddleware, Request, Response } from 'lambda-forge'
 
-@Lambda
-class CreatePost {
-  constructor(@Inject(PostsService) private postsService: PostsService) {}
-
-  // Must be called 'main'
-  @Returns(201, Post)
-  async main(@Body(CreatePostDTO) createPost: CreatePostDTO): Promise<Post> {
-    const post = await this.postsService.createPost(createPost)
-    return post
+@Middleware
+export class AuthMiddleware implements ForgeMiddleware {
+  async use(req: Request, res: Response, next: (error?: any) => void) {
+    // Validate authentication
+    const token = req.headers['authorization']
+    if (!token) {
+      throw new UnauthorizedError('Missing token')
+    }
+    next()
   }
 }
 
-export const main = forge.createHandler(CreatePost)
+// Apply middleware to handlers
+@Lambda()
+class SecureHandler {
+  @UseMiddlewares([AuthMiddleware])
+  async main() {
+    // Only runs if middleware passes
+  }
+}
 ```
 
-In this example:
+### Error Handling
 
-The `@Lambda` decorator marks the class as a Lambda function.
-
-The `@Inject` decorator injects the PostsService into the class.
-
-The `@Returns` decorator defines the expected response type and status code.
-
-The `@Body` decorator handles validation and type safety for the request body.
-
-A handler to get a single post:
+Built-in error classes for common HTTP scenarios:
 
 ```typescript
-import 'reflect-metadata'
-import { Lambda, Inject, Returns, Body, Forge } from 'lambda-forge'
-import PostsService from '../services/PostsService'
-import Post from '../entities/Post'
-import CreatePostDTO from '../dtos/CreatePostDTO'
-import { forge } from '../app.ts'
+import { NotFoundError, BadRequestError } from 'lambda-forge'
 
-@Lambda
-class GetPost {
-  constructor(@Inject(PostsService) private postsService: PostsService) {}
+@Lambda()
+class GetUserHandler {
+  async main(@Param('id') id: string) {
+    const user = await this.userService.findById(id)
+    if (!user) {
+      throw new NotFoundError('User not found')
+    }
+    return user
+  }
+}
+```
 
-  @Returns(200, Post)
-  async main(@Param('id') postId: string): Promise<Post> {
-    return await this.postsService.getPost(postId)
+### Dependency Injection and Service Initialization
+
+Services can inject other services and use `@OnExecutionStart` for one-time initialization:
+
+```typescript
+@Service({ singleton: true })
+class DatabaseService {
+  private connection: any;
+
+  @OnExecutionStart()
+  async initialize() {
+    // This will run once when the service is first used
+    this.connection = await createDatabaseConnection();
+    console.log('Database connection initialized');
+  }
+
+  async query(sql: string) {
+    return this.connection.query(sql);
   }
 }
 
-export const main = forge.createHandler(CreatePost)
+@Service()
+class UserService {
+  constructor(
+    @Inject(DatabaseService) private db: DatabaseService,
+    @Inject(AuthService) private auth: AuthService
+  ) {}
+}
 ```
 
-In this example, we use the `@Param` decorator to extract the path parameter from the request.
+### Framework Integration
 
-A handler to get multiple posts:
+lambda-forge is framework-agnostic. Meaning you can use your functions as you would in any IAC tools that support Typescript lambda functions as long as your function exports a `createHttpHandler` or `createHandler`.
+
+
+#### AWS CDK Example
 
 ```typescript
-import 'reflect-metadata'
-import { Lambda, Inject, Returns, Query } from 'lambda-forge'
-import { unauthForge } from '../../app'
-import PostsService from '../services/PostsService'
-import Post from '../entities/Post'
-import { PostsFilter } from '../dtos/PostsFilter'
+import * as lambda from 'aws-cdk-lib/aws-lambda-nodejs'
 
-@Lambda
-class GetPosts {
-  constructor(@Inject(PostsService) private postsService: PostsService) {}
-
-  @Returns(200, Post, { many: true })
-  async main(@Query() filter: PostsFilter): Promise<Post[]> {
-    const posts = await this.postsService.getPosts(filter)
-    return posts
-  }
-}
-
-export const main = unauthForge.createHandler(GetPosts)
+const handler = new lambda.NodejsFunction(this, 'MyHandler', {
+  entry: 'path/to/handler.ts',
+  handler: 'handler'
+})
 ```
 
-In this example, we use the @Query decorator to extract the query parameters from the request.
-We also use `{ many: true }` as the last argument to the `@Returns` decorator to ensure that the lambda returns an array as its response.
+#### Serverless Framework Example
 
-<br/>
+```yaml
+functions:
+  myHandler:
+    handler: src/handlers/my.handler
+    events:
+      - http:
+          path: /resource
+          method: get
+```
 
-# Contributing
+## Best Practices
 
-We welcome contributions! Please submit pull requests or open issues to suggest improvements or report bugs.
+1. **Service Organization**: Group related functionality into services
+2. **DTO Validation**: Always validate incoming request bodies using DTOs
+3. **Error Handling**: Use built-in error classes for consistent error responses
+4. **Middleware**: Use middleware for cross-cutting concerns like authentication
+5. **Testing**: Take advantage of dependency injection for easy unit testing
 
-# License
+## Testing
 
-This project is licensed under the MIT License.
+Lambda Forge makes testing straightforward:
+
+```typescript
+describe('MyHandler', () => {
+  let handler: MyHandler
+  let mockService: jest.Mocked<MyService>
+
+  beforeEach(() => {
+    mockService = {
+      getData: jest.fn()
+    }
+    handler = new MyHandler(mockService)
+  })
+
+  it('should return data', async () => {
+    mockService.getData.mockResolvedValue({ id: '123', data: 'test' })
+    const result = await handler.main('123')
+    expect(result).toEqual({ id: '123', data: 'test' })
+  })
+})
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
