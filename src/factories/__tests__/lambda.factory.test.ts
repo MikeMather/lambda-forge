@@ -66,12 +66,69 @@ describe('LambdaForge', () => {
   })
 
   describe('executeMiddleware', () => {
-    it('should execute middleware', async () => {
-      jest.setTimeout(30000)
-      const req = new Request({} as any)
-      const res = new Response()
-      await lambdaForge.executeMiddlewares(req, res, [MockMiddleware])
-      expect(req.context.user).not.toBeNull()
+      it('should execute middleware', async () => {
+        jest.setTimeout(30000)
+        const req = new Request({} as any)
+        const res = new Response()
+        await lambdaForge.executeMiddlewares(req, res, [MockMiddleware])
+        expect(req.context.user).not.toBeNull()
+      })
+
+      it('should handle middleware errors', async () => {
+        const ErrorMiddleware = class {
+          use(_req: Request, _res: Response, next: (error?: Error) => void) {
+            next(new Error('Middleware error'))
+          }
+        }
+        
+        const req = new Request({} as any)
+        const res = new Response()
+        
+        await expect(lambdaForge.executeMiddlewares(req, res, [ErrorMiddleware]))
+          .rejects.toThrow('Middleware error')
+      })
     })
-  })
+
+    describe('validateReturn', () => {
+      class ValidReturnType {
+        name: string = 'test'
+      }
+
+      it('should validate single return value', () => {
+        const result = new ValidReturnType()
+        expect(() => lambdaForge.validateReturn(result, ValidReturnType, false))
+          .not.toThrow()
+      })
+
+      it('should validate array return value when returnsMany is true', () => {
+        const result = [new ValidReturnType()]
+        expect(() => lambdaForge.validateReturn(result, ValidReturnType, true))
+          .not.toThrow()
+      })
+
+      it('should throw error for non-array when returnsMany is true', () => {
+        const result = new ValidReturnType()
+        expect(() => lambdaForge.validateReturn(result, ValidReturnType, true))
+          .toThrow('Expected array')
+      })
+    })
+
+    describe('formatResponseBody', () => {
+      it('should return string as-is', () => {
+        const result = lambdaForge.formatResponseBody('test string')
+        expect(result).toBe('test string')
+      })
+
+      it('should convert Buffer to base64 string', () => {
+        const buffer = Buffer.from('test buffer')
+        const result = lambdaForge.formatResponseBody(buffer)
+        expect(result).toBe(buffer.toString('base64'))
+      })
+
+      it('should return other types as-is', () => {
+        const obj = { key: 'value' }
+        const result = lambdaForge.formatResponseBody(obj)
+        expect(result).toBe(obj)
+      })
+    })
 })
