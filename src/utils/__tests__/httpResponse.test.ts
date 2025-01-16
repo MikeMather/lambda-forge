@@ -30,13 +30,13 @@ describe('httpResponse', () => {
     it('should return a 204 status code', () => {
       const response = HttpResponse.noContent()
       expect(response.statusCode).toBe(204)
-      expect(response.body).toBe('undefined')
+      expect(response.body).toBe(undefined)
     })
 
     it('should handle ok response without body', () => {
       const response = HttpResponse.ok()
       expect(response.statusCode).toBe(200)
-      expect(response.body).toBe('undefined')
+      expect(response.body).toBe(undefined)
     })
   })
 

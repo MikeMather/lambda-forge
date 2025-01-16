@@ -76,7 +76,7 @@ describe('LambdaForge', () => {
 
       it('should handle middleware errors', async () => {
         const ErrorMiddleware = class {
-          use(_req: Request, _res: Response, next: (error?: Error) => void) {
+          async use(_req: Request, _res: Response, next: (error?: Error) => void) {
             next(new Error('Middleware error'))
           }
         }
@@ -109,7 +109,7 @@ describe('LambdaForge', () => {
       it('should throw error for non-array when returnsMany is true', () => {
         const result = new ValidReturnType()
         expect(() => lambdaForge.validateReturn(result, ValidReturnType, true))
-          .toThrow('Expected array')
+          .toThrow('Validation error')
       })
     })
 
